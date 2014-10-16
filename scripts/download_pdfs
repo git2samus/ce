@@ -1,0 +1,3 @@
+#!/bin/bash
+
+wget http://www.corteelectoral.gub.uy/planes2014/{AB,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T}.pdf
