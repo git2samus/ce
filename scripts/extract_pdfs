@@ -1,0 +1,8 @@
+#!/bin/bash
+
+: "${1:?Missing arguments}"
+
+for arg; do
+    echo "Extracting $arg" >&2
+    pdftotext -layout "$arg"
+done
