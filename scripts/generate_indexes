@@ -1,0 +1,37 @@
+#!/usr/bin/env python
+import re
+
+def _process_page(page, cols):
+    lines = page.split('\n')
+
+    for line in lines[1:]:
+        if not line:
+            break
+
+        yield re.split(' *', line.strip(), cols)
+
+
+process_mvd_page = lambda page: _process_page(page, 4)
+process_dpt_page = lambda page: _process_page(page, 5)
+
+def process_raw(filename):
+    with open(filename) as raw:
+        dpt = raw.readline().strip()
+
+        if dpt == 'MONTEVIDEO':
+            processor = process_mvd_page
+        else:
+            processor = process_dpt_page
+
+        pages = raw.read().split('\x0C')
+        rows = tuple(
+            row for page in pages for row in processor(page)
+        )
+
+        print rows
+
+if __name__ == '__main__':
+    import sys
+
+    for arg in sys.argv[1:]:
+        process_raw(arg)
