@@ -1,37 +1,64 @@
 #!/usr/bin/env python
-import re
+import re, json
+from collections import defaultdict
 
-def _process_page(page, cols):
+
+def _process_page(page, headers):
     lines = page.split('\n')
 
     for line in lines[1:]:
         if not line:
             break
 
-        yield re.split(' *', line.strip(), cols)
-
-
-process_mvd_page = lambda page: _process_page(page, 4)
-process_dpt_page = lambda page: _process_page(page, 5)
-
-def process_raw(filename):
-    with open(filename) as raw:
-        dpt = raw.readline().strip()
-
-        if dpt == 'MONTEVIDEO':
-            processor = process_mvd_page
+        if len(headers) == 5:
+            cols_re = r'^ *(\d+) *([A-Z]{3}) *(\d+) *(\d+) *(.*)$'
         else:
-            processor = process_dpt_page
+            cols_re = r'^ *(\d+) *([^ ]+) *([A-Z]{3}) *(\d+) *(\d+) *(.*)$'
 
-        pages = raw.read().split('\x0C')
-        rows = tuple(
-            row for page in pages for row in processor(page)
-        )
+        match = re.search(cols_re, line)
+        if not match:
+            continue
 
-        print rows
+        yield dict(zip(headers, match.groups()))
+
+
+process_mvd_page = lambda page: _process_page(page, (
+    'Circuito', 'Serie', 'Desde', 'Hasta', 'Local y Direcci\xc3\xb3n'
+))
+process_dpt_page = lambda page: _process_page(page, (
+    'Circuito', 'Urbano / Rural', 'Serie', 'Desde', 'Hasta', 'Localidad, Local y Direcci\xc3\xb3n'
+))
+
+def process_raws(*filenames):
+    index = defaultdict(dict)
+
+    for filename in filenames:
+        with open(filename) as raw:
+            dpt = raw.readline().strip()
+
+            if dpt == 'MONTEVIDEO':
+                processor = process_mvd_page
+            else:
+                processor = process_dpt_page
+
+            pages = raw.read().split('\x0C')
+            rows = (
+                row for page in pages for row in processor(page)
+            )
+
+            for row in rows:
+                row['Departamento'] = dpt
+
+                for nro in range(int(row['Desde']), int(row['Hasta'])+1):
+                    index[row['Serie']][nro] = row
+
+    for serie, values in index.items():
+        print "Generating serie %s..." % serie
+        with open('%s.json' % serie, 'w') as ix:
+            json.dump(values, ix)
+
 
 if __name__ == '__main__':
     import sys
 
-    for arg in sys.argv[1:]:
-        process_raw(arg)
+    process_raws(*sys.argv[1:])
