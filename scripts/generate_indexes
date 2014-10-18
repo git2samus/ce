@@ -30,7 +30,7 @@ process_dpt_page = lambda page: _process_page(page, (
 ))
 
 def process_raws(*filenames):
-    index = defaultdict(dict)
+    index = defaultdict(list)
 
     for filename in filenames:
         with open(filename) as raw:
@@ -48,9 +48,7 @@ def process_raws(*filenames):
 
             for row in rows:
                 row['Departamento'] = dpt
-
-                for nro in range(int(row['Desde']), int(row['Hasta'])+1):
-                    index[row['Serie']][nro] = row
+                index[row['Serie']].append(row)
 
     for serie, values in index.items():
         print "Generating serie %s..." % serie
