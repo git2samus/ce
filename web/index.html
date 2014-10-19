@@ -34,7 +34,7 @@
               <label for="id-numero">Número</label>
               <input type="number" ng-model="numero" class="form-control" id="id-numero" placeholder="Ejemplo: 1234">
             </div>
-            <button ng-disabled="!data.length" ng-click="buscar()" class="btn btn-success">Buscar</button>
+            <button ng-click="buscar()" ng-disabled="!data.length" class="btn btn-success">Buscar</button>
           </form>
         </div>
 
@@ -59,29 +59,22 @@
     <script>
       var votauyApp = angular.module('votauyApp', []);
 
-      votauyApp.controller('votauyController', function($scope, $http, $timeout) {
-        var timer=false, delay=1000;
+      votauyApp.controller('votauyController', function($scope, $http) {
         $scope.data = [];
         $scope.errors = [];
 
         $scope.$watch('serie', function() {
-          if (timer) {
-            $timeout.cancel(timer);
+          if ($scope.serie && /[A-Za-z]{3}/.test($scope.serie)) {
+            var jsonUrl = 'data/' + $scope.serie.toUpperCase() + '.json';
+            $scope.data = [];
+            $scope.errors = [];
+
+            $http.get(jsonUrl).success(function(data) {
+              $scope.data = data;
+            }).error(function(data, status, headers, config) {
+              $scope.errors.push("No se encontró la serie.");
+            });
           };
-
-          timer = $timeout(function() {
-            if ($scope.serie && /[A-Za-z]{3}/.test($scope.serie)) {
-              var jsonUrl = 'data/' + $scope.serie.toUpperCase() + '.json';
-              $scope.data = [];
-              $scope.errors = [];
-
-              $http.get(jsonUrl).success(function(data) {
-                $scope.data = data;
-              }).error(function(data, status, headers, config) {
-                $scope.errors.push("No se encontró la serie.");
-              });
-            };
-          }, delay)
         });
 
         $scope.buscar = function() {
