@@ -37,9 +37,11 @@
               <button type="submit" class="btn btn-success">Buscar</button>
             </form>
         </div>
+
         <div class="col-md-8">
-          <h2>Resultado</h2>
-          <pre ng-bind="index" />          
+            <h2>Resultado</h2>
+            <div ng-repeat="msg in errors" class="alert alert-danger" role="alert"><strong>Error: </strong>{{ msg }}</div>          
+            <pre ng-bind="index" />
        </div>
       </div>
 
@@ -58,6 +60,7 @@
 
         votauyApp.controller('votauyController', function($scope, $http, $timeout) {
             var timer=false, delay=1000;
+            $scope.errors = [];
        
             $scope.$watch('serie', function() {
                 if (timer)
@@ -66,10 +69,14 @@
                 timer = $timeout(function() {
                     if ($scope.serie && /[A-Za-z]{3}/.test($scope.serie)) {
                         var jsonUrl = 'data/' + $scope.serie.toUpperCase() + '.json';
+                        $scope.errors = [];
 
                         $http.get(jsonUrl).success(function(data) {
-                            console.log('b');
                             $scope.index = data;
+                                
+                        }).error(function(data, status, headers, config) {
+                            $scope.index = "404";
+                            $scope.errors.push("No se encontró la serie.");
                         });
                     };
                 }, delay)
