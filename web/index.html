@@ -25,24 +25,24 @@
     <div class="container">
       <div class="row">
         <div class="col-md-4">
-            <form role="form">
-              <div class="form-group">
-                <label for="id-serie">Serie</label>
-                <input type="text" ng-model="serie" class="form-control" maxlength="3" pattern="[A-Za-z]{3}" id="id-serie" placeholder="Ejemplo: AZA">
-              </div>
-              <div class="form-group">
-                <label for="id-numero">Número</label>
-                <input type="number" ng-model="numero" class="form-control" id="id-numero" placeholder="Ejemplo: 1234">
-              </div>
-              <button ng-click="buscar()" class="btn btn-success">Buscar</button>
-            </form>
+          <form role="form">
+            <div class="form-group">
+              <label for="id-serie">Serie</label>
+              <input type="text" ng-model="serie" class="form-control" maxlength="3" pattern="[A-Za-z]{3}" id="id-serie" placeholder="Ejemplo: AZA">
+            </div>
+            <div class="form-group">
+              <label for="id-numero">Número</label>
+              <input type="number" ng-model="numero" class="form-control" id="id-numero" placeholder="Ejemplo: 1234">
+            </div>
+            <button ng-disabled="!data.length" ng-click="buscar()" class="btn btn-success">Buscar</button>
+          </form>
         </div>
 
         <div class="col-md-8">
-            <h2>Resultado</h2>
-            <div ng-repeat="msg in errors" class="alert alert-danger" role="alert"><strong>Error: </strong>{{ msg }}</div>          
-            <pre ng-bind="result" />
-       </div>
+          <h2>Resultado</h2>
+          <div ng-repeat="msg in errors" class="alert alert-danger" role="alert"><strong>Error: </strong>{{ msg }}</div>
+          <pre ng-bind="result" />
+        </div>
       </div>
 
       <hr>
@@ -55,53 +55,55 @@
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
+
     <script>
-        var votauyApp = angular.module('votauyApp', []);
+      var votauyApp = angular.module('votauyApp', []);
 
-        votauyApp.controller('votauyController', function($scope, $http, $timeout) {
-            var timer=false, delay=1000;
-            $scope.data = [];
-            $scope.errors = {};
-       
-            $scope.$watch('serie', function() {
-                if (timer)
-                    $timeout.cancel(timer);
+      votauyApp.controller('votauyController', function($scope, $http, $timeout) {
+        var timer=false, delay=1000;
+        $scope.data = [];
+        $scope.errors = [];
 
-                timer = $timeout(function() {
-                    if ($scope.serie && /[A-Za-z]{3}/.test($scope.serie)) {
-                        var jsonUrl = 'data/' + $scope.serie.toUpperCase() + '.json';
-                        $scope.data = [];
-                        delete($scope.errors['serie']);
+        $scope.$watch('serie', function() {
+          if (timer) {
+            $timeout.cancel(timer);
+          };
 
-                        $http.get(jsonUrl).success(function(data) {
-                            $scope.data = data;
-                        }).error(function(data, status, headers, config) {
-                            $scope.errors['serie'] = "No se encontró la serie.";
-                        });
-                    };
-                }, delay)
-            });
+          timer = $timeout(function() {
+            if ($scope.serie && /[A-Za-z]{3}/.test($scope.serie)) {
+              var jsonUrl = 'data/' + $scope.serie.toUpperCase() + '.json';
+              $scope.data = [];
+              $scope.errors = [];
 
-            $scope.buscar = function(){
-                $scope.result = null;
-                delete($scope.errors['numero']);
-
-                var numero = parseInt($scope.numero);
-                for(var i = 0; i < $scope.data.length; i++){
-                    var desde = parseInt($scope.data[i]["Desde"]);
-                    var hasta = parseInt($scope.data[i]["Hasta"]);
-
-                    if (numero >= desde && numero <= hasta){
-                        $scope.result = $scope.data[i];
-                        break;
-                    }
-                }
-
-                if (!$scope.result){
-                    $scope.errors.push("No se encuentra el número en la base de datos!");
-                }
-            }
+              $http.get(jsonUrl).success(function(data) {
+                $scope.data = data;
+              }).error(function(data, status, headers, config) {
+                $scope.errors.push("No se encontró la serie.");
+              });
+            };
+          }, delay)
         });
+
+        $scope.buscar = function() {
+          $scope.result = null;
+          $scope.errors = [];
+
+          var numero = parseInt($scope.numero);
+          for(var i = 0; i < $scope.data.length; i++) {
+            var desde = parseInt($scope.data[i]["Desde"]);
+            var hasta = parseInt($scope.data[i]["Hasta"]);
+
+            if (numero >= desde && numero <= hasta){
+              $scope.result = $scope.data[i];
+              break;
+            }
+          }
+
+          if (!$scope.result) {
+            $scope.errors.push("No se encuentra el número en la base de datos!");
+          }
+        }
+      });
     </script>
   </body>
 </html>
