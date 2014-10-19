@@ -34,7 +34,7 @@
                 <label for="id-numero">Número</label>
                 <input type="number" ng-model="numero" class="form-control" id="id-numero" placeholder="Ejemplo: 1234">
               </div>
-              <button type="submit" class="btn btn-success">Buscar</button>
+              <button ng-click="buscar()" class="btn btn-success">Buscar</button>
             </form>
         </div>
 
@@ -61,6 +61,7 @@
         votauyApp.controller('votauyController', function($scope, $http, $timeout) {
             var timer=false, delay=1000;
             $scope.errors = [];
+            $scope.data = [];
        
             $scope.$watch('serie', function() {
                 if (timer)
@@ -70,17 +71,26 @@
                     if ($scope.serie && /[A-Za-z]{3}/.test($scope.serie)) {
                         var jsonUrl = 'data/' + $scope.serie.toUpperCase() + '.json';
                         $scope.errors = [];
+                        $scope.data = [];
 
                         $http.get(jsonUrl).success(function(data) {
-                            $scope.index = data;
-                                
+                            $scope.data = data;
                         }).error(function(data, status, headers, config) {
-                            $scope.index = "404";
                             $scope.errors.push("No se encontró la serie.");
                         });
                     };
                 }, delay)
             });
+            $scope.buscar = function(){
+                var numero = parseInt($scope.numero);
+                for(var i = 0; i < $scope.data.length; i++){
+                    var desde = parseInt($scope.data[i]["Desde"]);
+                    var hasta = parseInt($scope.data[i]["Hasta"]);
+                    if (numero >= desde && numero <= hasta){
+                        $scope.index = $scope.data[i]["Local y Direcci\u00f3n"];
+                    }
+                }
+            }
         });
     </script>
   </body>
