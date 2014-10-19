@@ -41,7 +41,7 @@
         <div class="col-md-8">
             <h2>Resultado</h2>
             <div ng-repeat="msg in errors" class="alert alert-danger" role="alert"><strong>Error: </strong>{{ msg }}</div>          
-            <pre ng-bind="index" />
+            <pre ng-bind="result" />
        </div>
       </div>
 
@@ -60,8 +60,8 @@
 
         votauyApp.controller('votauyController', function($scope, $http, $timeout) {
             var timer=false, delay=1000;
-            $scope.errors = [];
             $scope.data = [];
+            $scope.errors = {};
        
             $scope.$watch('serie', function() {
                 if (timer)
@@ -70,25 +70,35 @@
                 timer = $timeout(function() {
                     if ($scope.serie && /[A-Za-z]{3}/.test($scope.serie)) {
                         var jsonUrl = 'data/' + $scope.serie.toUpperCase() + '.json';
-                        $scope.errors = [];
                         $scope.data = [];
+                        delete($scope.errors['serie']);
 
                         $http.get(jsonUrl).success(function(data) {
                             $scope.data = data;
                         }).error(function(data, status, headers, config) {
-                            $scope.errors.push("No se encontró la serie.");
+                            $scope.errors['serie'] = "No se encontró la serie.";
                         });
                     };
                 }, delay)
             });
+
             $scope.buscar = function(){
+                $scope.result = null;
+                delete($scope.errors['numero']);
+
                 var numero = parseInt($scope.numero);
                 for(var i = 0; i < $scope.data.length; i++){
                     var desde = parseInt($scope.data[i]["Desde"]);
                     var hasta = parseInt($scope.data[i]["Hasta"]);
+
                     if (numero >= desde && numero <= hasta){
-                        $scope.index = $scope.data[i]["Local y Direcci\u00f3n"];
+                        $scope.result = $scope.data[i];
+                        break;
                     }
+                }
+
+                if (!$scope.result){
+                    $scope.errors.push("No se encuentra el número en la base de datos!");
                 }
             }
         });
