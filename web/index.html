@@ -4,23 +4,26 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="VotaUY - Plan cirucital 2014">
+    <meta name="description" content="VotaUY - Plan circuital 2014">
     <meta name="author" content="zweckdev">
-    <link rel="icon" href="http://www.datauy.org/wp-content/uploads/2011/12/DATA_favicon.png" type="image/png">
-
 
     <title>VotaUY</title>
 
     <!-- Bootstrap core CSS -->
-    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
 
     <!-- Custom styles for this template -->
     <link href="assets/css/main.css" rel="stylesheet">
 
+    <!-- make ng-cloak work before Angular is loaded -->
+    <style>
+      [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak { display: none !important; }
+    </style>
+
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+      <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="//oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
     <![endif]-->
   </head>
 
@@ -35,39 +38,46 @@
       </div>
     </div>
 
-	<!-- +++++ Welcome Section +++++ -->
-	<div id="ww">
-	    <div class="container">
+    <!-- +++++ Welcome Section +++++ -->
+    <div id="ww">
+      <div class="container">
 
         <div class="row">
           <div class="col-md-12">
-                <h1>Bienvenido!</h1>
-                <p class="text-justify">VotaUY tiene como misión la creación de un sitio para realizar consultas sobre el plan circuital de las elecciones nacionales de Octubre del 2014, alternativo al oficial.
-                   La idea surgió en las elecciones pasadas al observar que el sitio oficial quedó fuera de linea debio a la alta demanda.
-                   VotaUY está construido en base a tecnologías de la información diseñadas para soportar un gran número de consultas simultaneas.
-                </p>
+            <h1>Bienvenido!</h1>
+            <p class="text-justify">
+              VotaUY tiene como misión la creación de un sitio para realizar consultas sobre el plan circuital de las elecciones nacionales de Octubre del 2014, alternativo al oficial.
+              La idea surgió en las elecciones pasadas al observar que el sitio oficial quedó fuera de linea debio a la alta demanda.
+              VotaUY está construido en base a tecnologías de la información diseñadas para soportar un gran número de consultas simultaneas.
+            </p>
+
+            <h2>¿Donde voto?</h2>
+            <p>
+              Complete los campos con la serie y el número de su credencial civica para obtener el circuito correspondiente.
+            </p>
           </div>
         </div>
 
-          <div class="row show-grid">
-            <div class="col-md-4">
-              <form role="form">
-                <div class="form-group">
-                  <label for="id-serie">Serie</label>
-                  <input type="text" ng-model="serie" class="form-control" maxlength="3" pattern="[A-Za-z]{3}" id="id-serie" placeholder="Ejemplo: AZA">
-                </div>
-                <div class="form-group">
-                  <label for="id-numero">Número</label>
-                  <input type="number" ng-model="numero" class="form-control" min="1" id="id-numero" placeholder="Ejemplo: 1234">
-                </div>
-                <button ng-click="buscar()" ng-disabled="!data.length || !numero" class="btn btn-success">Buscar</button>
-              </form>
-            </div>
+        <div class="row show-grid">
+          <div class="col-md-4">
+            <div ng-cloak ng-repeat="msg in errors" class="alert alert-danger" role="alert"><strong>Error: </strong>{{ msg }}</div>
 
-            <div class="col-md-8">
-              <h2>¿Donde voto?</h2>
-              <p>Complete los campos con la serie y el número de su credencial civica para obtener el circuito correspondiente.</p>
-              <div ng-repeat="msg in errors" class="alert alert-danger" role="alert"><strong>Error: </strong>{{ msg }}</div>
+            <form role="form">
+              <div class="form-group">
+                <label for="id-serie">Serie</label>
+                <input type="text" ng-model="serie" class="form-control" maxlength="3" pattern="[A-Za-z]{3}" id="id-serie" placeholder="Ejemplo: AZA">
+              </div>
+              <div class="form-group">
+                <label for="id-numero">Número</label>
+                <input type="number" ng-model="numero" class="form-control" min="1" id="id-numero" placeholder="Ejemplo: 1234">
+              </div>
+              <button ng-click="buscar()" ng-disabled="!data.length || !numero" class="btn btn-success">Buscar</button>
+            </form>
+          </div>
+
+          <div class="col-md-8" ng-cloak>
+            <div ng-show="result">
+              <h3>Resultados</h3>
               <table class="table table-bordered">
                 <tr ng-repeat="(key, val) in result|orderBy:key">
                   <th>{{ key }}:</th>
@@ -76,64 +86,43 @@
               </table>
             </div>
           </div>
+        </div>
 
-	    </div> <!-- /container -->
-	</div><!-- /ww -->
-	
-	
-	<!-- +++++ Projects Section +++++ -->
-	
-	<div class="container pt">
-		<div class="row mt centered">	
-			<div class="col-lg-4">
-				<a class="zoom green" href="#"><img class="img-responsive" src="assets/img/portfolio/port01.jpg" alt="" /></a>
-			</div>
-			<div class="col-lg-4">
-				<a class="zoom green" href="#"><img class="img-responsive" src="assets/img/portfolio/port02.jpg" alt="" /></a>
-			</div>
-			<div class="col-lg-4">
-				<a class="zoom green" href="#"><img class="img-responsive" src="assets/img/portfolio/port03.jpg" alt="" /></a>
-			</div>
-		</div><!-- /row -->
-	</div><!-- /container -->
+      </div> <!-- /container -->
+    </div><!-- /ww -->
 
-	<div class="container">
-		<div class="row">
-		</div><!-- /row -->
-	</div><!-- /container -->
-	
-	
-	<!-- +++++ Footer Section +++++ -->
-	
-	<div id="footer">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-4">
-					<h4>VotaUY</h4>
-					<p>
-						&copy; 2014 VotaUY<br/>
-						Montevideo, Uruguay.
-					</p>
-				</div><!-- /col-lg-4 -->
 
-				
-				<div class="col-lg-8">
-					<h4>Advertencia</h4>
-					<p>Debido a que eventualmente se producen cambios de locales por fuerza mayor, se recomienda confirmar nuevamente el circuito correspondiente antes de la fecha de la elección en la web oficial de la corte electoral. VotaUY no se hace responsable por la información brindada.</p>
-				</div><!-- /col-lg-4 -->
-			
-			</div>
-		
-		</div>
-	</div>
-	
+    <!-- +++++ Footer Section +++++ -->
+
+    <div id="footer">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-3">
+            <h4>VotaUY</h4>
+            <p>
+              &copy; 2014 VotaUY<br/>
+              Montevideo, Uruguay.
+            </p>
+          </div><!-- /col-lg-4 -->
+
+
+          <div class="col-md-9">
+            <h4>Advertencia</h4>
+            <p>Debido a que eventualmente se producen cambios de locales por fuerza mayor, se recomienda confirmar nuevamente el circuito correspondiente antes de la fecha de la elección en la web oficial de la corte electoral. VotaUY no se hace responsable por la información brindada.</p>
+          </div><!-- /col-lg-4 -->
+
+        </div>
+
+      </div>
+    </div>
+
 
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
 
     <script>
       var votauyApp = angular.module('votauyApp', []);
@@ -146,6 +135,7 @@
           if ($scope.serie && /[A-Za-z]{3}/.test($scope.serie)) {
             var jsonUrl = 'data/' + $scope.serie.toUpperCase() + '.json';
             $scope.data = [];
+            $scope.result = null;
             $scope.errors = [];
 
             $http.get(jsonUrl).success(function(data) {
